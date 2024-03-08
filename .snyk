@@ -1,3 +1,4 @@
 exclude:
   global:
     - src/main/java/org/example/util/**
+    - src/main/java/org/example/insecure/v2/**
