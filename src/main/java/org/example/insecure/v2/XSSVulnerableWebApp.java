@@ -1,19 +1,26 @@
 package org.example.insecure.v2;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
+
 public class XSSVulnerableWebApp {
 
     public static void main(String[] args) {
-        // Simulação de parâmetros de solicitação
-        String mensagem = "<script>alert('XSS!');</script>";
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("myPersistenceUnit");
+        EntityManager em = emf.createEntityManager();
 
-        // Escreve a resposta HTML
-        System.out.println("<html>");
-        System.out.println("<head><title>XSS Vulnerável</title></head>");
-        System.out.println("<body>");
-        System.out.println("<h1>Mensagem:</h1>");
-        System.out.println("<p>" + mensagem + "</p>"); // Potencialmente vulnerável a XSS
-        System.out.println("</body>");
-        System.out.println("</html>");
+        // Parâmetros obtidos diretamente do usuário (suposto valor inserido pelo usuário)
+        String username = args[0];
+        String password = args[1];
+
+        // Inserção com vulnerabilidade de segurança (vulnerável a injeção de SQL)
+        em.getTransaction().begin();
+        em.createNativeQuery("INSERT INTO users (username, password) VALUES ('" + username + "', '" + password + "')").executeUpdate();
+        em.getTransaction().commit();
+
+        em.close();
+        emf.close();
     }
 }
 
